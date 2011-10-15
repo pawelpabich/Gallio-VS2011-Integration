@@ -1,0 +1,6 @@
+Gallio VS2011 Integration
+
+This project is a prototype that integrates the VS2011 Test Window and Gallio.
+
+You will need to download and install Gallio (http://www.gallio) and the most recent public version of VS2011.
+
