@@ -179,78 +179,33 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
 
         void ITestExecutor.RunTests(IEnumerable<string> sources, IRunContext runContext, ITestExecutionRecorder testExecutionRecorder)
         {          
-
             _launcher = new TestLauncher();
             foreach (string source in sources)
             {
                 _launcher.AddFilePattern(source);
             }
 
-
             RunTests(testExecutionRecorder);
         }
 
         private void RunTests(ITestExecutionRecorder testExecutionRecorder)
         {
-            _launcher.TestProject.TestRunnerFactoryName = StandardTestRunnerFactoryNames.IsolatedAppDomain;
-            _launcher.RuntimeSetup = new RuntimeSetup();
+            //_launcher.TestProject.TestRunnerFactoryName = StandardTestRunnerFactoryNames.IsolatedAppDomain;
+            //_launcher.RuntimeSetup = new RuntimeSetup();
 
             _launcher.TestProject.AddTestRunnerExtension(new VSTestWindowExtension(testExecutionRecorder));
 
             TestLauncherResult testLauncherResult = _launcher.Run();
 
-            //foreach (var allTestStepRun in testLauncherResult.Report.TestPackageRun.AllTestStepRuns)
-            //{
-            //    if (allTestStepRun.Step.IsTestCase)
-            //    {
-            //        TestCase tc = new TestCase(allTestStepRun.Step.FullName, new Uri(ExecutorUri));
-            //        tc.Source = allTestStepRun.Step.CodeReference.AssemblyName;
-            //        ObjectModel.TestResult testResult = new ObjectModel.TestResult(tc);
-            //        testResult.DisplayName = allTestStepRun.Step.Name;
-            //        testResult.ErrorLineNumber = allTestStepRun.Step.CodeLocation.Line;
-            //        //testResult.ErrorStackTrace
-            //        testResult.StartTime = allTestStepRun.StartTime;
-            //        if (allTestStepRun.TestLog.Streams.Count > 0)
-            //        {
-            //            testResult.ErrorMessage = allTestStepRun.TestLog.Streams[0].ToString();
-            //        }
-            //        testResult.EndTime = allTestStepRun.EndTime;               
-            //        testResult.Duration = allTestStepRun.Result.Duration;
-         
-            //        var testStatus = allTestStepRun.Result.Outcome.Status;
-            //        switch (testStatus)
-            //        {
-            //            case TestStatus.Passed:
-            //                testResult.Outcome = ObjectModel.TestOutcome.Passed;
-            //                break;
-            //            case TestStatus.Failed:
-            //                testResult.Outcome = ObjectModel.TestOutcome.Failed;
-            //                break;
-            //            case TestStatus.Skipped:
-            //                testResult.Outcome = ObjectModel.TestOutcome.Skipped;
-            //                break;
-            //            case TestStatus.Inconclusive: //is this right to use not found?
-            //                testResult.Outcome = ObjectModel.TestOutcome.NotFound;
-            //                break;
-            //        }
-
-            //        testExecutionRecorder.RecordResult(testResult);
-            //    }
-            //}
+            
         }
 
-        //not picking up
-        void ITestExecutor.RunTests(IEnumerable<TestCase> tests, IRunContext runContext, ITestExecutionRecorder testExecutionRecorder)
+              void ITestExecutor.RunTests(IEnumerable<TestCase> tests, IRunContext runContext, ITestExecutionRecorder testExecutionRecorder)
         {
             _launcher = new TestLauncher();
 
-       
-
             foreach (var test in tests)
-            {
-                //var assembly = test.Source.Split(',')[0] + ".dll";
-                //_launcher.TestProject.TestPackage.AddFile(new FileInfo(assembly));
-
+            {              
                 var testProperty = TestProperty.Register("filecount", "filecount", typeof(int), typeof(int));
                 var testCount = test.GetPropertyValue<int>(testProperty, 0);
 
@@ -258,12 +213,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
                 {
                     var tp = CreateTestProperty("fileid" + testCount, "filelabel" + testCount);
                     var file = test.GetPropertyValue<string>(tp, "");
-
-                    _launcher.TestProject.TestPackage.AddFile(new FileInfo(file));
+                    _launcher.AddFilePattern(file);
                 }
                     
-
-                _launcher.TestExecutionOptions.FilterSet = FilterUtils.ParseTestFilterSet("ExactType:" + test.DisplayName);
+                //_launcher.TestExecutionOptions.FilterSet = FilterUtils.ParseTestFilterSet("ExactType:" + test.DisplayName);
             }
 
             RunTests(testExecutionRecorder);
