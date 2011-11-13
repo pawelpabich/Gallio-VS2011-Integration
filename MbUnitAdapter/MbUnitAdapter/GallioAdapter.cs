@@ -47,8 +47,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
 
                 frameworkLogger.Log(LogSeverity.Info, "Gallio starting up");
 
-                var diaMap = new Dictionary<string, DiaSession>();
-
                 var gallioTestscases = GetGallioTestcases(frameworkLogger, sources);
                 if (gallioTestscases != null)
                 {
