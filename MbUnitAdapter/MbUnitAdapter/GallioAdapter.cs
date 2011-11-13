@@ -24,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
     public class GallioAdapter : ITestDiscoverer, ITestExecutor
     {
         public const string ExecutorUri = "executor://www.mbunit.com/GallioAdapter";
-        private TestLauncher _launcher = null;
+        private TestLauncher _launcher;
         private TestProperty testIdProperty;
         private TestProperty fileCountProperty;
   
