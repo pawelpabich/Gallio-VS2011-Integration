@@ -25,15 +25,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
     {
         public const string ExecutorUri = "executor://www.mbunit.com/GallioAdapter";
         private TestLauncher _launcher;
-        private TestProperty testIdProperty;
-        private TestProperty fileCountProperty;
+        private readonly TestProperty testIdProperty;
+        private readonly TestProperty filePathProperty;
   
         public GallioAdapter()
         {
              LoaderManager.InitializeAndSetupRuntimeIfNeeded();
 
              testIdProperty = TestProperty.Register("Gallio.TestId", "Test id", typeof(string), typeof(TestCase));
-             fileCountProperty = TestProperty.Register("Gallio.FileCount", "File count", typeof(int), typeof(int));
+             filePathProperty = TestProperty.Register("Gallio.FilePath", "File path", typeof(string), typeof(TestCase));
         }
 
         #region Test Discovery
@@ -75,7 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
 
         private void CreateTestCase(TestData testData, ITestCaseDiscoverySink discoverySink, TestFrameworkLogger logger, IEnumerable<string> sources)
         {
-            TestCase testCase = GetTestCase(testData, sources);
+            TestCase testCase = GetTestCase(testData);
             
             logger.Log(LogSeverity.Info, "Sending to the sink");
 
@@ -84,25 +84,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
 
         }
 
-        internal TestCase GetTestCase(TestData testData, IEnumerable<string> sources)
+        private TestCase GetTestCase(TestData testData)
         {
-            TestCase testCase = new TestCase(testData.FullName, new Uri(ExecutorUri));
-            testCase.DisplayName = testData.CodeElement.Name;
-            testCase.Source = testData.CodeReference.AssemblyName;
-            testCase.CodeFilePath = testData.CodeLocation.Path;
-            testCase.LineNumber = testData.CodeLocation.Line;
-            
-            testCase.SetPropertyValue(testIdProperty, testData.Id);
-
-            int count = 0;
-            foreach (var source in sources)
+            var testCase = new TestCase(testData.FullName, new Uri(ExecutorUri))
             {
-                count += 1;
-                var tp = CreateTestProperty("fileid" + count, "filelabel" + count);
-                testCase.SetPropertyValue<string>(tp, source);
-            }
+                DisplayName = testData.CodeElement.Name,
+                Source = testData.CodeReference.AssemblyName,
+                CodeFilePath = testData.CodeLocation.Path,
+                LineNumber = testData.CodeLocation.Line
+            };
+
+            testCase.SetPropertyValue(testIdProperty, testData.Id);
             
-            testCase.SetPropertyValue(fileCountProperty, count);
+            var assembly = ReflectionUtils.GetAssembly(testData.CodeElement);
+            testCase.SetPropertyValue(filePathProperty, assembly.Path);
 
             return testCase;
         }
@@ -207,14 +202,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
 
             foreach (var test in tests)
             {
-                var testCount = test.GetPropertyValue<int>(fileCountProperty, 0);
-
-                for (int i = 0; i < testCount; i++)
-                {
-                    var tp = CreateTestProperty("fileid" + testCount, "filelabel" + testCount);
-                    var file = test.GetPropertyValue<string>(tp, "");
-                    _launcher.AddFilePattern(file);
-                }
+                var filePath = test.GetPropertyValue(filePathProperty, "");
+                _launcher.AddFilePattern(filePath);
             }
 
             SetTestFilter(tests);
@@ -228,12 +217,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
             var filters = tests.Select(t => new EqualityFilter<string>(t.GetPropertyValue(testIdProperty).ToString())).ToArray();
             var filterSet = new FilterSet<ITestDescriptor>(new IdFilter<ITestDescriptor>(new OrFilter<string>(filters)));
             _launcher.TestExecutionOptions.FilterSet = filterSet;
-        }
-
-        private TestProperty CreateTestProperty(string id, string label)
-        {
-            var testProperty = TestProperty.Register(id, label, typeof(string), typeof(string));
-            return testProperty;
         }
     }
 }
