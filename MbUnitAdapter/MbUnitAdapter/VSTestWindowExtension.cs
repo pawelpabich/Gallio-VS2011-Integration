@@ -27,6 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
               var testResult = CreateTest(e.Test, e.TestStepRun, testCase);
 
               _executionRecorder.RecordEnd(testCase, testResult.Outcome);
+              _executionRecorder.RecordResult(testResult);
         }
      
         private void LogTestCaseStarted(TestStepStartedEventArgs e)
@@ -36,9 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
 
             var testResult = CreateTest(e.Test, e.TestStepRun, testCase);
 
-            _executionRecorder.RecordStart(testCase);
-
-            _executionRecorder.RecordResult(testResult);   
+            _executionRecorder.RecordStart(testCase);            
         }
 
         private TestCase CreateTestCase(TestData test)
