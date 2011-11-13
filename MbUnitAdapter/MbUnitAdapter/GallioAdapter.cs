@@ -26,10 +26,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
     {
         public const string ExecutorUri = "executor://www.mbunit.com/GallioAdapter";
         private TestLauncher _launcher = null;
+        private TestProperty testIdProperty;
+        private TestProperty fileCountProperty;
   
         public GallioAdapter()
         {
              LoaderManager.InitializeAndSetupRuntimeIfNeeded();
+
+             testIdProperty = TestProperty.Register("Gallio.TestId", "Test id", typeof(string), typeof(TestCase));
+             fileCountProperty = TestProperty.Register("Gallio.FileCount", "File count", typeof(int), typeof(int));
         }
 
         #region Test Discovery
@@ -57,7 +62,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
                 frameworkLogger.Log(LogSeverity.Error, String.Format("Gallio: Exception discovering tests from {0}", ex));
             }
         }
-          
 
         private void MapGallioTestCases(IEnumerable<TestData> gallioTestCases, TestFrameworkLogger logger, ITestCaseDiscoverySink discoverySink, IEnumerable<string> sources)
         {
@@ -90,7 +94,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
             testCase.Source = testData.CodeReference.AssemblyName;
             testCase.CodeFilePath = testData.CodeLocation.Path;
             testCase.LineNumber = testData.CodeLocation.Line;
-
+            
+            testCase.SetPropertyValue(testIdProperty, testData.Id);
 
             int count = 0;
             foreach (var source in sources)
@@ -99,9 +104,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
                 var tp = CreateTestProperty("fileid" + count, "filelabel" + count);
                 testCase.SetPropertyValue<string>(tp, source);
             }
-
-            var testProperty = TestProperty.Register("filecount", "filecount", typeof(int), typeof(int));
-            testCase.SetPropertyValue<int>(testProperty, count);
+            
+            testCase.SetPropertyValue(fileCountProperty, count);
 
             return testCase;
         }
@@ -205,9 +209,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
             _launcher = new TestLauncher();
 
             foreach (var test in tests)
-            {              
-                var testProperty = TestProperty.Register("filecount", "filecount", typeof(int), typeof(int));
-                var testCount = test.GetPropertyValue<int>(testProperty, 0);
+            {
+                var testCount = test.GetPropertyValue<int>(fileCountProperty, 0);
 
                 for (int i = 0; i < testCount; i++)
                 {
@@ -215,12 +218,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
                     var file = test.GetPropertyValue<string>(tp, "");
                     _launcher.AddFilePattern(file);
                 }
-                    
-                //_launcher.TestExecutionOptions.FilterSet = FilterUtils.ParseTestFilterSet("ExactType:" + test.DisplayName);
             }
+
+            SetTestFilter(tests);
 
             RunTests(testExecutionRecorder);
          
+        }
+
+        private void SetTestFilter(IEnumerable<TestCase> tests)
+        {
+            var filters = tests.Select(t => new EqualityFilter<string>(t.GetPropertyValue(testIdProperty).ToString())).ToArray();
+            var filterSet = new FilterSet<ITestDescriptor>(new IdFilter<ITestDescriptor>(new OrFilter<string>(filters)));
+            _launcher.TestExecutionOptions.FilterSet = filterSet;
         }
 
         private TestProperty CreateTestProperty(string id, string label)
