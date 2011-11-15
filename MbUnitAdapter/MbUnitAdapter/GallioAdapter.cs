@@ -54,7 +54,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
                 if (gallioTestscases != null)
                 {
                     frameworkLogger.Log(LogSeverity.Info, "Found " + gallioTestscases.Count().ToString());
-                    MapGallioTestCases(gallioTestscases, frameworkLogger, discoverySink, sources);
+                    MapGallioTestCases(gallioTestscases, frameworkLogger, discoverySink);
                 }
             }
             catch (Exception ex)
@@ -63,28 +63,18 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
             }
         }
 
-        private void MapGallioTestCases(IEnumerable<TestData> gallioTestCases, TestFrameworkLogger logger, ITestCaseDiscoverySink discoverySink, IEnumerable<string> sources)
+        private void MapGallioTestCases(IEnumerable<TestData> gallioTestCases, TestFrameworkLogger logger, ITestCaseDiscoverySink discoverySink)
         {
-            foreach(var gallioTestCase in gallioTestCases)
+            foreach (var gallioTestCase in gallioTestCases)
             {
-                CreateTestCase(gallioTestCase, discoverySink, logger);
+                var testCase = testCaseFactory.GetTestCase(gallioTestCase);
+                discoverySink.SendTestCase(testCase);
 
-                if(gallioTestCase.Children.Count > 0)
-                 {
-                     MapGallioTestCases(gallioTestCase.AllTests, logger, discoverySink, sources);
-                 }
+                if (gallioTestCase.Children.Count > 0)
+                {
+                    MapGallioTestCases(gallioTestCase.AllTests, logger, discoverySink);
+                }
             }
-        }
-
-        private void CreateTestCase(TestData testData, ITestCaseDiscoverySink discoverySink, TestFrameworkLogger logger)
-        {
-            TestCase testCase = testCaseFactory.GetTestCase(testData);
-            
-            logger.Log(LogSeverity.Info, "Sending to the sink");
-
-            discoverySink.SendTestCase(testCase);
-            
-
         }
 
         private ICodeElementInfo LoadAssembly(string source, ReflectionOnlyAssemblyLoader loader)
