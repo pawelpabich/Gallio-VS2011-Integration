@@ -173,7 +173,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
             _launcher.Cancel();
         }
 
-        void ITestExecutor.RunTests(IEnumerable<string> sources, IRunContext runContext, ITestExecutionRecorder testExecutionRecorder)
+        public void RunTests(IEnumerable<string> sources, IRunContext runContext, ITestExecutionRecorder testExecutionRecorder)
         {          
             _launcher = new TestLauncher();
             foreach (string source in sources)
@@ -196,7 +196,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
             
         }
 
-              void ITestExecutor.RunTests(IEnumerable<TestCase> tests, IRunContext runContext, ITestExecutionRecorder testExecutionRecorder)
+        public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, ITestExecutionRecorder testExecutionRecorder)
         {
             _launcher = new TestLauncher();
 
