@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Gallio.Model;
 using Gallio.Model.Schema;
 using Gallio.Runner.Events;
