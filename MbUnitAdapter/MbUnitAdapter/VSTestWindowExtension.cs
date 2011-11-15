@@ -10,7 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
 {
     internal class VSTestWindowExtension : TestRunnerExtension
     {
-        private ITestExecutionRecorder _executionRecorder;
+        private readonly ITestExecutionRecorder _executionRecorder;
 
         public VSTestWindowExtension(ITestExecutionRecorder executionRecorder)
         {
