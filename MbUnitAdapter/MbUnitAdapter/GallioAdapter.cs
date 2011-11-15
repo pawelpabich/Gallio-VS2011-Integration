@@ -64,7 +64,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
         {
             foreach(var gallioTestCase in gallioTestCases)
             {
-                CreateTestCase(gallioTestCase, discoverySink, logger, sources);
+                CreateTestCase(gallioTestCase, discoverySink, logger);
 
                 if(gallioTestCase.Children.Count > 0)
                  {
@@ -73,7 +73,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
             }
         }
 
-        private void CreateTestCase(TestData testData, ITestCaseDiscoverySink discoverySink, TestFrameworkLogger logger, IEnumerable<string> sources)
+        private void CreateTestCase(TestData testData, ITestCaseDiscoverySink discoverySink, TestFrameworkLogger logger)
         {
             TestCase testCase = GetTestCase(testData);
             
