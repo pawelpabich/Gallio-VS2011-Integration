@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace Microsoft.VisualStudio.TestPlatform.Gallio
 {
-    public class TestCaseFactory
+    public class TestCaseFactory : ITestCaseFactory
     {
         private readonly TestProperty testIdProperty;
         private readonly TestProperty filePathProperty;
