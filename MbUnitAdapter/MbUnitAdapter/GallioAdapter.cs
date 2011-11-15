@@ -27,13 +27,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
         private TestLauncher _launcher;
         private readonly TestProperty testIdProperty;
         private readonly TestProperty filePathProperty;
-  
+        private TestCaseFactory testCaseFactory;
+
         public GallioAdapter()
         {
              LoaderManager.InitializeAndSetupRuntimeIfNeeded();
 
              testIdProperty = TestProperty.Register("Gallio.TestId", "Test id", typeof(string), typeof(TestCase));
              filePathProperty = TestProperty.Register("Gallio.FilePath", "File path", typeof(string), typeof(TestCase));
+
+            testCaseFactory = new TestCaseFactory(testIdProperty, filePathProperty);
         }
 
         #region Test Discovery
@@ -75,31 +78,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
 
         private void CreateTestCase(TestData testData, ITestCaseDiscoverySink discoverySink, TestFrameworkLogger logger)
         {
-            TestCase testCase = GetTestCase(testData);
+            TestCase testCase = testCaseFactory.GetTestCase(testData);
             
             logger.Log(LogSeverity.Info, "Sending to the sink");
 
             discoverySink.SendTestCase(testCase);
             
 
-        }
-
-        private TestCase GetTestCase(TestData testData)
-        {
-            var testCase = new TestCase(testData.FullName, new Uri(ExecutorUri))
-            {
-                DisplayName = testData.CodeElement.Name,
-                Source = testData.CodeReference.AssemblyName,
-                CodeFilePath = testData.CodeLocation.Path,
-                LineNumber = testData.CodeLocation.Line
-            };
-
-            testCase.SetPropertyValue(testIdProperty, testData.Id);
-            
-            var assembly = ReflectionUtils.GetAssembly(testData.CodeElement);
-            testCase.SetPropertyValue(filePathProperty, assembly.Path);
-
-            return testCase;
         }
 
         private ICodeElementInfo LoadAssembly(string source, ReflectionOnlyAssemblyLoader loader)
