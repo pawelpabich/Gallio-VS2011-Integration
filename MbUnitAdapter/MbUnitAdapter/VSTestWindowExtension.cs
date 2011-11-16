@@ -1,5 +1,4 @@
-﻿using System;
-using Gallio.Model;
+﻿using Gallio.Model;
 using Gallio.Model.Schema;
 using Gallio.Runner.Events;
 using Gallio.Runner.Extensions;
@@ -11,10 +10,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
     internal class VSTestWindowExtension : TestRunnerExtension
     {
         private readonly ITestExecutionRecorder _executionRecorder;
+        private readonly ITestCaseFactory testCaseFactory;
 
-        public VSTestWindowExtension(ITestExecutionRecorder executionRecorder)
+        public VSTestWindowExtension(ITestExecutionRecorder executionRecorder, ITestCaseFactory testCaseFactory)
         {
             _executionRecorder = executionRecorder;
+            this.testCaseFactory = testCaseFactory;
         }
 
         private void LogTestCaseFinished(TestStepFinishedEventArgs e)
@@ -35,9 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
 
         private TestCase CreateTestCase(TestData test)
         {
-            TestCase testCase = new TestCase(test.FullName, new Uri(GallioAdapter.ExecutorUri));
-            testCase.Source = test.CodeReference.AssemblyName;
-            return testCase;
+            return testCaseFactory.GetTestCase(test);
         }
 
         private ObjectModel.TestResult CreateTest(TestData test, TestStepRun stepRun, TestCase testCase)

@@ -164,7 +164,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
             //_launcher.TestProject.TestRunnerFactoryName = StandardTestRunnerFactoryNames.IsolatedAppDomain;
             //_launcher.RuntimeSetup = new RuntimeSetup();
 
-            _launcher.TestProject.AddTestRunnerExtension(new VSTestWindowExtension(testExecutionRecorder));
+            _launcher.TestProject.AddTestRunnerExtension(new VSTestWindowExtension(testExecutionRecorder, testCaseFactory));
 
             TestLauncherResult testLauncherResult = _launcher.Run();
 
