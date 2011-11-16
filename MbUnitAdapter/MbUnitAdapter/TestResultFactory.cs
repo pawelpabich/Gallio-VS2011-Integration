@@ -16,19 +16,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
             {
                 DisplayName = test.Name,
                 ErrorLineNumber = test.CodeLocation.Line,
-                StartTime = stepRun.StartTime
+                StartTime = stepRun.StartTime,
+                EndTime = stepRun.EndTime,
+                Duration = stepRun.Result.Duration,
+                Outcome = GetOutcome(stepRun.Result.Outcome.Status),
+                //ErrorStackTrace = ?,
             };
-            //testResult.ErrorStackTrace
-            
+
             if (stepRun.TestLog.Streams.Count > 0)
             {
                 testResult.ErrorMessage = stepRun.TestLog.Streams[0].ToString();
             }
-            
-            testResult.EndTime = stepRun.EndTime;
-            testResult.Duration = stepRun.Result.Duration;
-
-            testResult.Outcome = GetOutcome(stepRun.Result.Outcome.Status);
 
             return testResult;
         }
