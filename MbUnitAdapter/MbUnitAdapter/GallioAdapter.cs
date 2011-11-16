@@ -6,10 +6,8 @@ using Gallio.Common.Messaging;
 using Gallio.Common.Reflection;
 using Gallio.Loader;
 using Gallio.Model;
-using Gallio.Model.Filters;
 using Gallio.Model.Messages.Exploration;
 using Gallio.Model.Schema;
-using Gallio.Runner;
 using Gallio.Runtime;
 using Gallio.Runtime.Logging;
 using Gallio.Runtime.ProgressMonitoring;
@@ -24,11 +22,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
     public class GallioAdapter : ITestDiscoverer, ITestExecutor
     {
         public const string ExecutorUri = "executor://www.mbunit.com/GallioAdapter";
-        private TestLauncher _launcher;
         private readonly TestProperty testIdProperty;
         private readonly TestProperty filePathProperty;
         private readonly TestCaseFactory testCaseFactory;
         private readonly TestResultFactory testResultFactory;
+        private readonly TestRunner testRunner;
 
         public GallioAdapter()
         {
@@ -39,6 +37,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
 
             testCaseFactory = new TestCaseFactory(testIdProperty, filePathProperty);
             testResultFactory = new TestResultFactory();
+
+            testRunner = new TestRunner(testCaseFactory, testResultFactory, testIdProperty, filePathProperty);
         }
 
         #region Test Discovery
@@ -147,51 +147,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
 
         public void Cancel()
         {           
-            _launcher.Cancel();
+            testRunner.Cancel();
         }
 
         public void RunTests(IEnumerable<string> sources, IRunContext runContext, ITestExecutionRecorder testExecutionRecorder)
-        {          
-            _launcher = new TestLauncher();
-            foreach (string source in sources)
-            {
-                _launcher.AddFilePattern(source);
-            }
-
-            RunTests(testExecutionRecorder);
-        }
-
-        private void RunTests(ITestExecutionRecorder testExecutionRecorder)
         {
-            //_launcher.TestProject.TestRunnerFactoryName = StandardTestRunnerFactoryNames.IsolatedAppDomain;
-            //_launcher.RuntimeSetup = new RuntimeSetup();
-
-            _launcher.TestProject.AddTestRunnerExtension(new VSTestWindowExtension(testExecutionRecorder, testCaseFactory, testResultFactory));
-
-            _launcher.Run();
+            testRunner.RunTests(sources, testExecutionRecorder);
         }
 
         public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, ITestExecutionRecorder testExecutionRecorder)
         {
-            _launcher = new TestLauncher();
-
-            foreach (var test in tests)
-            {
-                var filePath = test.GetPropertyValue(filePathProperty, "");
-                _launcher.AddFilePattern(filePath);
-            }
-
-            SetTestFilter(tests);
-
-            RunTests(testExecutionRecorder);
-         
-        }
-
-        private void SetTestFilter(IEnumerable<TestCase> tests)
-        {
-            var filters = tests.Select(t => new EqualityFilter<string>(t.GetPropertyValue(testIdProperty).ToString())).ToArray();
-            var filterSet = new FilterSet<ITestDescriptor>(new IdFilter<ITestDescriptor>(new OrFilter<string>(filters)));
-            _launcher.TestExecutionOptions.FilterSet = filterSet;
+            testRunner.RunTests(tests, testExecutionRecorder);
         }
     }
 }
