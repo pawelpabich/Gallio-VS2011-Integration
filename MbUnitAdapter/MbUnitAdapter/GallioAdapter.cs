@@ -56,7 +56,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
                 if (gallioTestscases != null)
                 {
                     frameworkLogger.Log(LogSeverity.Info, "Found " + gallioTestscases.Count().ToString());
-                    MapGallioTestCases(gallioTestscases, frameworkLogger, discoverySink);
+                    MapGallioTestCases(gallioTestscases, discoverySink);
                 }
             }
             catch (Exception ex)
@@ -65,7 +65,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
             }
         }
 
-        private void MapGallioTestCases(IEnumerable<TestData> gallioTestCases, TestFrameworkLogger logger, ITestCaseDiscoverySink discoverySink)
+        private void MapGallioTestCases(IEnumerable<TestData> gallioTestCases, ITestCaseDiscoverySink discoverySink)
         {
             foreach (var gallioTestCase in gallioTestCases)
             {
@@ -74,7 +74,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
 
                 if (gallioTestCase.Children.Count > 0)
                 {
-                    MapGallioTestCases(gallioTestCase.AllTests, logger, discoverySink);
+                    MapGallioTestCases(gallioTestCase.AllTests, discoverySink);
                 }
             }
         }
