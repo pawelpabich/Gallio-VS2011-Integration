@@ -20,16 +20,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
         {
             var testCase = new TestCase(testData.FullName, new Uri(GallioAdapter.ExecutorUri))
             {
-                DisplayName = testData.CodeElement.Name,
                 Source = testData.CodeReference.AssemblyName,
                 CodeFilePath = testData.CodeLocation.Path,
                 LineNumber = testData.CodeLocation.Line
             };
 
-            testCase.SetPropertyValue(testIdProperty, testData.Id);
+            if (testData.CodeElement != null)
+            {
+                testCase.DisplayName = testData.CodeElement.Name;
+                var assembly = ReflectionUtils.GetAssembly(testData.CodeElement);
+                testCase.SetPropertyValue(filePathProperty, assembly.Path);
+            }
 
-            var assembly = ReflectionUtils.GetAssembly(testData.CodeElement);
-            testCase.SetPropertyValue(filePathProperty, assembly.Path);
+            testCase.SetPropertyValue(testIdProperty, testData.Id);
 
             return testCase;
         } 
