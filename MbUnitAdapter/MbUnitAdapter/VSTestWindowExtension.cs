@@ -1,8 +1,5 @@
-﻿using Gallio.Model;
-using Gallio.Model.Schema;
-using Gallio.Runner.Events;
+﻿using Gallio.Runner.Events;
 using Gallio.Runner.Extensions;
-using Gallio.Runner.Reports.Schema;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace Microsoft.VisualStudio.TestPlatform.Gallio
@@ -11,18 +8,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
     {
         private readonly ITestExecutionRecorder _executionRecorder;
         private readonly ITestCaseFactory testCaseFactory;
+        private readonly ITestResultFactory testResultFactory;
 
-        public VSTestWindowExtension(ITestExecutionRecorder executionRecorder, ITestCaseFactory testCaseFactory)
+        public VSTestWindowExtension(ITestExecutionRecorder executionRecorder, ITestCaseFactory testCaseFactory, ITestResultFactory testResultFactory)
         {
             _executionRecorder = executionRecorder;
             this.testCaseFactory = testCaseFactory;
+            this.testResultFactory = testResultFactory;
         }
 
         private void LogTestCaseFinished(TestStepFinishedEventArgs e)
         {
             var testCase = testCaseFactory.GetTestCase(e.Test);
 
-              var testResult = CreateTest(e.Test, e.TestStepRun, testCase);
+              var testResult = testResultFactory.BuildTestResult(e.Test, e.TestStepRun, testCase);
 
               _executionRecorder.RecordEnd(testCase, testResult.Outcome);
               _executionRecorder.RecordResult(testResult);
@@ -33,43 +32,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
             var testCase = testCaseFactory.GetTestCase(e.Test);
             _executionRecorder.RecordStart(testCase);
         }
-
-        private ObjectModel.TestResult CreateTest(TestData test, TestStepRun stepRun, TestCase testCase)
-        {  
-            ObjectModel.TestResult testResult = new ObjectModel.TestResult(testCase);
-            testResult.DisplayName = test.Name;
-            testResult.ErrorLineNumber = test.CodeLocation.Line;
-            //testResult.ErrorStackTrace
-            testResult.StartTime = stepRun.StartTime;
-            if (stepRun.TestLog.Streams.Count > 0)
-            {
-                testResult.ErrorMessage = stepRun.TestLog.Streams[0].ToString();
-            }
-            testResult.EndTime = stepRun.EndTime;
-          
-            testResult.Duration = stepRun.Result.Duration;
-
-            var testStatus = stepRun.Result.Outcome.Status;
-            switch (testStatus)
-            {
-                case TestStatus.Passed:
-                    testResult.Outcome = ObjectModel.TestOutcome.Passed;
-                    break;
-                case TestStatus.Failed:
-                    testResult.Outcome = ObjectModel.TestOutcome.Failed;
-                    break;
-                case TestStatus.Skipped:
-                    testResult.Outcome = ObjectModel.TestOutcome.Skipped;
-                    break;
-                case TestStatus.Inconclusive: 
-                    testResult.Outcome = ObjectModel.TestOutcome.NotFound;
-                    break;
-            }
-
-            return testResult;
-        }
-
-
 
         protected override void Initialize()
         {

@@ -28,6 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
         private readonly TestProperty testIdProperty;
         private readonly TestProperty filePathProperty;
         private readonly TestCaseFactory testCaseFactory;
+        private TestResultFactory testResultFactory;
 
         public GallioAdapter()
         {
@@ -37,6 +38,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
              filePathProperty = TestProperty.Register("Gallio.FilePath", "File path", typeof(string), typeof(TestCase));
 
             testCaseFactory = new TestCaseFactory(testIdProperty, filePathProperty);
+            testResultFactory = new TestResultFactory();
         }
 
         #region Test Discovery
@@ -164,7 +166,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
             //_launcher.TestProject.TestRunnerFactoryName = StandardTestRunnerFactoryNames.IsolatedAppDomain;
             //_launcher.RuntimeSetup = new RuntimeSetup();
 
-            _launcher.TestProject.AddTestRunnerExtension(new VSTestWindowExtension(testExecutionRecorder, testCaseFactory));
+            _launcher.TestProject.AddTestRunnerExtension(new VSTestWindowExtension(testExecutionRecorder, testCaseFactory, testResultFactory));
 
             TestLauncherResult testLauncherResult = _launcher.Run();
 
