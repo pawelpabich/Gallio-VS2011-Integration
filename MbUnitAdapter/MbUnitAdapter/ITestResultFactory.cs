@@ -6,6 +6,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
 {
     public interface ITestResultFactory
     {
-        TestResult BuildTestResult(TestData test, TestStepRun stepRun, TestCase testCase);
+        TestResult BuildTestResult(TestData testData, TestStepRun testStepRun, TestCase testCase);
     }
 }

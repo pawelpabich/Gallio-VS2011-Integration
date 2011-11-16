@@ -1,4 +1,5 @@
 ﻿using System;
+using Gallio.Common.Markup;
 using Gallio.Model;
 using Gallio.Model.Schema;
 using Gallio.Runner.Reports.Schema;
@@ -10,25 +11,25 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
 {
     public class TestResultFactory : ITestResultFactory
     {
-        public TestResult BuildTestResult(TestData test, TestStepRun stepRun, TestCase testCase)
+        public TestResult BuildTestResult(TestData testData, TestStepRun testStepRun, TestCase testCase)
         {
-            var testResult = new TestResult(testCase)
+            return new TestResult(testCase)
             {
-                DisplayName = test.Name,
-                ErrorLineNumber = test.CodeLocation.Line,
-                StartTime = stepRun.StartTime,
-                EndTime = stepRun.EndTime,
-                Duration = stepRun.Result.Duration,
-                Outcome = GetOutcome(stepRun.Result.Outcome.Status),
+                DisplayName = testData.Name,
+                ErrorLineNumber = testData.CodeLocation.Line,
+                StartTime = testStepRun.StartTime,
+                EndTime = testStepRun.EndTime,
+                Duration = testStepRun.Result.Duration,
+                Outcome = GetOutcome(testStepRun.Result.Outcome.Status),
+                ErrorMessage = GetErrorMessage(testStepRun),
                 //ErrorStackTrace = ?,
             };
+        }
 
-            if (stepRun.TestLog.Streams.Count > 0)
-            {
-                testResult.ErrorMessage = stepRun.TestLog.Streams[0].ToString();
-            }
-
-            return testResult;
+        private static string GetErrorMessage(TestStepRun stepRun)
+        {
+            var failuresStream = stepRun.TestLog.GetStream(MarkupStreamNames.Failures);
+            return failuresStream != null ? failuresStream.ToString() : "";
         }
 
         private static TestOutcome GetOutcome(TestStatus testStatus)
