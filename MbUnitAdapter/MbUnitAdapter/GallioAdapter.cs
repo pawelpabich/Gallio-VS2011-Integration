@@ -168,9 +168,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
 
             _launcher.TestProject.AddTestRunnerExtension(new VSTestWindowExtension(testExecutionRecorder, testCaseFactory, testResultFactory));
 
-            TestLauncherResult testLauncherResult = _launcher.Run();
-
-            
+            _launcher.Run();
         }
 
         public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, ITestExecutionRecorder testExecutionRecorder)
