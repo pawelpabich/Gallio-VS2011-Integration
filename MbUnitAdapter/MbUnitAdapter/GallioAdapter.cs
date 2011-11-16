@@ -28,7 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
         private readonly TestProperty testIdProperty;
         private readonly TestProperty filePathProperty;
         private readonly TestCaseFactory testCaseFactory;
-        private TestResultFactory testResultFactory;
+        private readonly TestResultFactory testResultFactory;
 
         public GallioAdapter()
         {
