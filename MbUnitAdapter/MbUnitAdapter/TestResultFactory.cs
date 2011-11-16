@@ -13,7 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
     {
         public TestResult BuildTestResult(TestData testData, TestStepRun testStepRun, TestCase testCase)
         {
-            return new TestResult(testCase)
+            var testResult = new TestResult(testCase)
             {
                 DisplayName = testData.Name,
                 ErrorLineNumber = testData.CodeLocation.Line,
@@ -21,15 +21,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
                 EndTime = testStepRun.EndTime,
                 Duration = testStepRun.Result.Duration,
                 Outcome = GetOutcome(testStepRun.Result.Outcome.Status),
-                ErrorMessage = GetErrorMessage(testStepRun),
-                //ErrorStackTrace = ?,
             };
-        }
 
-        private static string GetErrorMessage(TestStepRun stepRun)
-        {
-            var failuresStream = stepRun.TestLog.GetStream(MarkupStreamNames.Failures);
-            return failuresStream != null ? failuresStream.ToString() : "";
+            var failuresStream = testStepRun.TestLog.GetStream(MarkupStreamNames.Failures);
+            if (failuresStream != null)
+            {
+                testResult.ErrorMessage = failuresStream.ToString();
+                failuresStream.Body.AcceptContents(new StackTraceHunter(s => testResult.ErrorStackTrace = s));
+            }
+
+            return testResult;
         }
 
         private static TestOutcome GetOutcome(TestStatus testStatus)

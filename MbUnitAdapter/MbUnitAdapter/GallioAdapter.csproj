@@ -60,6 +60,7 @@
     <Compile Include="ITestCaseFactory.cs" />
     <Compile Include="ITestResultFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StackTraceHunter.cs" />
     <Compile Include="TestCaseFactory.cs" />
     <Compile Include="TestExplorer.cs" />
     <Compile Include="TestFrameworkLogger.cs" />
