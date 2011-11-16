@@ -15,8 +15,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
 
         private readonly TestProperty testIdProperty;
         private readonly TestProperty filePathProperty;
-        private readonly TestCaseFactory testCaseFactory;
-        private readonly TestResultFactory testResultFactory;
+        private readonly ITestCaseFactory testCaseFactory;
+        private readonly ITestResultFactory testResultFactory;
         private readonly TestRunner testRunner;
         private readonly TestExplorer testExplorer;
 
@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
              testIdProperty = TestProperty.Register("Gallio.TestId", "Test id", typeof(string), typeof(TestCase));
              filePathProperty = TestProperty.Register("Gallio.FilePath", "File path", typeof(string), typeof(TestCase));
 
-            testCaseFactory = new TestCaseFactory(testIdProperty, filePathProperty);
+            testCaseFactory = new CachingTestCaseFactory(new TestCaseFactory(testIdProperty, filePathProperty));
             testResultFactory = new TestResultFactory();
 
             testExplorer = new TestExplorer(testCaseFactory);

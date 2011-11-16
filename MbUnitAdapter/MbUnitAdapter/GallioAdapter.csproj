@@ -55,6 +55,7 @@
     <Compile Include="C:\Program Files\Gallio\sdk\Loader\Gallio.Loader.cs">
       <Link>Gallio.Loader.cs</Link>
     </Compile>
+    <Compile Include="CachingTestCaseFactory.cs" />
     <Compile Include="GallioAdapter.cs" />
     <Compile Include="ITestCaseFactory.cs" />
     <Compile Include="ITestResultFactory.cs" />
