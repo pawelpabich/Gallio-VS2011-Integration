@@ -8,8 +8,8 @@
     <ProjectGuid>{896AC1CA-CB1B-4A94-A380-12EFDD5B10B3}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Microsoft.VisualStudio.TestPlatform.Gallio</RootNamespace>
-    <AssemblyName>Microsoft.VisualStudio.TestPlatform.Gallio</AssemblyName>
+    <RootNamespace>TestPlatform.Gallio</RootNamespace>
+    <AssemblyName>TestPlatform.Gallio</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
