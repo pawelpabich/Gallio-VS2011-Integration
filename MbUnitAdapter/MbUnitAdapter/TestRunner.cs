@@ -28,7 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
             launcher.Cancel();
         }
 
-        public void RunTests(IEnumerable<string> sources, ITestExecutionRecorder testExecutionRecorder)
+        public void RunTests(IEnumerable<string> sources, IRunContext runContext, ITestExecutionRecorder testExecutionRecorder)
         {
             launcher = new TestLauncher();
             
@@ -37,16 +37,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
                 launcher.AddFilePattern(source);
             }
 
-            RunTests(testExecutionRecorder);
+            RunTests(runContext, testExecutionRecorder);
         }
 
-        private void RunTests(ITestExecutionRecorder testExecutionRecorder)
+        private void RunTests(IRunContext runContext, ITestExecutionRecorder testExecutionRecorder)
         {
+            if (runContext.InIsolation)
+                launcher.TestProject.TestRunnerFactoryName = StandardTestRunnerFactoryNames.IsolatedAppDomain;
+
             launcher.TestProject.AddTestRunnerExtension(new VSTestWindowExtension(testExecutionRecorder, testCaseFactory, testResultFactory));
             launcher.Run();
         }
 
-        public void RunTests(IEnumerable<TestCase> tests, ITestExecutionRecorder testExecutionRecorder)
+        public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, ITestExecutionRecorder testExecutionRecorder)
         {
             launcher = new TestLauncher();
 
@@ -58,8 +61,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
 
             SetTestFilter(tests);
 
-            RunTests(testExecutionRecorder);
-
+            RunTests(runContext, testExecutionRecorder);
         }
 
         private void SetTestFilter(IEnumerable<TestCase> tests)

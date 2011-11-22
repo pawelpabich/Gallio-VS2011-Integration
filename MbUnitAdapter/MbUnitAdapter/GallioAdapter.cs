@@ -46,12 +46,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Gallio
 
         public void RunTests(IEnumerable<string> sources, IRunContext runContext, ITestExecutionRecorder testExecutionRecorder)
         {
-            testRunner.RunTests(sources, testExecutionRecorder);
+            testRunner.RunTests(sources, runContext, testExecutionRecorder);
         }
 
         public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, ITestExecutionRecorder testExecutionRecorder)
         {
-            testRunner.RunTests(tests, testExecutionRecorder);
+            testRunner.RunTests(tests, runContext, testExecutionRecorder);
         }
     }
 }
