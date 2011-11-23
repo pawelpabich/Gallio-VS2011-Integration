@@ -13,7 +13,7 @@ using Gallio.Runtime.ProgressMonitoring;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-namespace Microsoft.VisualStudio.TestPlatform.Gallio
+namespace TestPlatform.Gallio
 {
     public class TestExplorer
     {

@@ -3,7 +3,7 @@ using Gallio.Loader;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-namespace Microsoft.VisualStudio.TestPlatform.Gallio
+namespace TestPlatform.Gallio
 {
     [FileExtension(".dll")]
     [FileExtension(".exe")]

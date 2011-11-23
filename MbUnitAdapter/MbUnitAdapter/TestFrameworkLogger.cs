@@ -1,9 +1,8 @@
-﻿using System;
-using Gallio.Common.Diagnostics;
+﻿using Gallio.Common.Diagnostics;
 using Gallio.Runtime.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-namespace Microsoft.VisualStudio.TestPlatform.Gallio
+namespace TestPlatform.Gallio
 {
     public class TestFrameworkLogger : BaseLogger
     {

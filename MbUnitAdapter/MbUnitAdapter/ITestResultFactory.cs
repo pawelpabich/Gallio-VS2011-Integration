@@ -2,7 +2,7 @@ using Gallio.Model.Schema;
 using Gallio.Runner.Reports.Schema;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-namespace Microsoft.VisualStudio.TestPlatform.Gallio
+namespace TestPlatform.Gallio
 {
     public interface ITestResultFactory
     {

@@ -2,7 +2,7 @@
 using Gallio.Common.Markup;
 using Gallio.Common.Markup.Tags;
 
-namespace Microsoft.VisualStudio.TestPlatform.Gallio
+namespace TestPlatform.Gallio
 {
     public class StackTraceHunter : BaseTagVisitor
     {

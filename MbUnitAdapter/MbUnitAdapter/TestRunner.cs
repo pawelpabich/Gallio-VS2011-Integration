@@ -4,7 +4,7 @@ using Gallio.Model.Filters;
 using Gallio.Runner;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-namespace Microsoft.VisualStudio.TestPlatform.Gallio
+namespace TestPlatform.Gallio
 {
     public class TestRunner
     {

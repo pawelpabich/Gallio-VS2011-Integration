@@ -2,7 +2,7 @@
 using Gallio.Runner.Extensions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-namespace Microsoft.VisualStudio.TestPlatform.Gallio
+namespace TestPlatform.Gallio
 {
     internal class VSTestWindowExtension : TestRunnerExtension
     {

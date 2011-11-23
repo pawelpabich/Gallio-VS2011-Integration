@@ -7,7 +7,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using TestOutcome = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome;
 using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
 
-namespace Microsoft.VisualStudio.TestPlatform.Gallio
+namespace TestPlatform.Gallio
 {
     public class TestResultFactory : ITestResultFactory
     {
