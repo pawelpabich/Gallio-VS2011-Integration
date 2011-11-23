@@ -57,7 +57,7 @@ namespace TestPlatform.Gallio
                     .Handle<TestDiscoveredMessage>(message =>
                     {
                         if (message.Test.IsTestCase)
-                            tests.Add((message.Test));
+                            tests.Add(message.Test);
                     })
                     .Handle<AnnotationDiscoveredMessage>(message => message.Annotation.Log(frameworkLogger, true));
 
