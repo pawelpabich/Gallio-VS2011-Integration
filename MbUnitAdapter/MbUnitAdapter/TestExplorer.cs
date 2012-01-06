@@ -38,7 +38,7 @@ namespace TestPlatform.Gallio
                     return;
              
                 frameworkLogger.Log(LogSeverity.Info, "Found " + tests.Count());
-                PublishTests(tests, discoverySink);
+                PublishTests(tests, discoverySink, sources);
             }
             catch (Exception ex)
             {
@@ -111,16 +111,16 @@ namespace TestPlatform.Gallio
             return tests.Any(test => test.FullName.Contains("NUnitTest") || test.FullName.Contains("XUnitTest"));
         }
 
-        private void PublishTests(IEnumerable<TestData> tests, ITestCaseDiscoverySink discoverySink)
+        private void PublishTests(IEnumerable<TestData> tests, ITestCaseDiscoverySink discoverySink, IEnumerable<string> sources)
         {
             foreach (var test in tests)
             {
-                var testCase = testCaseFactory.GetTestCase(test);
+                var testCase = testCaseFactory.GetTestCase(test, sources);
                 discoverySink.SendTestCase(testCase);
 
                 if (test.Children.Count > 0)
                 {
-                    PublishTests(test.AllTests, discoverySink);
+                    PublishTests(test.AllTests, discoverySink, sources);
                 }
             }
         }

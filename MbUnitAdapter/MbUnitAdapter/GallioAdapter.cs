@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Gallio.Loader;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -46,11 +47,13 @@ namespace TestPlatform.Gallio
 
         public void RunTests(IEnumerable<string> sources, IRunContext runContext, ITestExecutionRecorder testExecutionRecorder)
         {
+        
             testRunner.RunTests(sources, runContext, testExecutionRecorder);
         }
 
         public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, ITestExecutionRecorder testExecutionRecorder)
         {
+        
             testRunner.RunTests(tests, runContext, testExecutionRecorder);
         }
     }

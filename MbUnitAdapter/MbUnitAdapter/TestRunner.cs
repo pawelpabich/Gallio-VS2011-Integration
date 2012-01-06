@@ -37,21 +37,25 @@ namespace TestPlatform.Gallio
                 launcher.AddFilePattern(source);
             }
 
-            RunTests(runContext, testExecutionRecorder);
+            RunTests(runContext, testExecutionRecorder, sources);
         }
 
-        private void RunTests(IRunContext runContext, ITestExecutionRecorder testExecutionRecorder)
+        private void RunTests(IRunContext runContext, ITestExecutionRecorder testExecutionRecorder, IEnumerable<string> source)
         {
             if (runContext.InIsolation)
                 launcher.TestProject.TestRunnerFactoryName = StandardTestRunnerFactoryNames.IsolatedAppDomain;
 
-            launcher.TestProject.AddTestRunnerExtension(new VSTestWindowExtension(testExecutionRecorder, testCaseFactory, testResultFactory));
+            var extension = new VSTestWindowExtension(testExecutionRecorder, testCaseFactory, testResultFactory, source);
+
+            launcher.TestProject.AddTestRunnerExtension(extension);
             launcher.Run();
         }
 
         public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, ITestExecutionRecorder testExecutionRecorder)
         {
             launcher = new TestLauncher();
+
+            var source = tests.GroupBy(tc => tc.Source).Select(testCaseGroup => testCaseGroup.Key).ToList();
 
             foreach (var test in tests)
             {
@@ -61,7 +65,7 @@ namespace TestPlatform.Gallio
 
             SetTestFilter(tests);
 
-            RunTests(runContext, testExecutionRecorder);
+            RunTests(runContext, testExecutionRecorder, source);
         }
 
         private void SetTestFilter(IEnumerable<TestCase> tests)

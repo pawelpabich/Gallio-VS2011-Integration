@@ -1,4 +1,5 @@
-﻿using Gallio.Runner.Events;
+﻿using System.Collections.Generic;
+using Gallio.Runner.Events;
 using Gallio.Runner.Extensions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -9,17 +10,20 @@ namespace TestPlatform.Gallio
         private readonly ITestExecutionRecorder _executionRecorder;
         private readonly ITestCaseFactory testCaseFactory;
         private readonly ITestResultFactory testResultFactory;
+        private IEnumerable<string> _source;
 
-        public VSTestWindowExtension(ITestExecutionRecorder executionRecorder, ITestCaseFactory testCaseFactory, ITestResultFactory testResultFactory)
+
+        public VSTestWindowExtension(ITestExecutionRecorder executionRecorder, ITestCaseFactory testCaseFactory, ITestResultFactory testResultFactory, IEnumerable<string> source)
         {
             _executionRecorder = executionRecorder;
             this.testCaseFactory = testCaseFactory;
             this.testResultFactory = testResultFactory;
+            _source = source;
         }
 
         private void LogTestCaseFinished(TestStepFinishedEventArgs e)
         {
-            var testCase = testCaseFactory.GetTestCase(e.Test);
+            var testCase = testCaseFactory.GetTestCase(e.Test, _source);
 
               var testResult = testResultFactory.BuildTestResult(e.Test, e.TestStepRun, testCase);
 
@@ -29,7 +33,7 @@ namespace TestPlatform.Gallio
      
         private void LogTestCaseStarted(TestStepStartedEventArgs e)
         {
-            var testCase = testCaseFactory.GetTestCase(e.Test);
+            var testCase = testCaseFactory.GetTestCase(e.Test, _source);
             _executionRecorder.RecordStart(testCase);
         }
 
