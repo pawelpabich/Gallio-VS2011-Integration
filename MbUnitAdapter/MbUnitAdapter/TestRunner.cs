@@ -11,16 +11,13 @@ namespace TestPlatform.Gallio
         private readonly ITestCaseFactory testCaseFactory;
         private readonly ITestResultFactory testResultFactory;
         private readonly TestProperty testIdProperty;
-        private readonly TestProperty filePathProperty;
         private TestLauncher launcher;
 
-        public TestRunner(ITestCaseFactory testCaseFactory, ITestResultFactory testResultFactory, 
-            TestProperty testIdProperty, TestProperty filePathProperty)
+        public TestRunner(ITestCaseFactory testCaseFactory, ITestResultFactory testResultFactory, TestProperty testIdProperty)
         {
             this.testCaseFactory = testCaseFactory;
             this.testResultFactory = testResultFactory;
             this.testIdProperty = testIdProperty;
-            this.filePathProperty = filePathProperty;
         }
 
         public void Cancel()
@@ -31,21 +28,21 @@ namespace TestPlatform.Gallio
         public void RunTests(IEnumerable<string> sources, IRunContext runContext, ITestExecutionRecorder testExecutionRecorder)
         {
             launcher = new TestLauncher();
-            
+
             foreach (var source in sources)
             {
                 launcher.AddFilePattern(source);
             }
 
-            RunTests(runContext, testExecutionRecorder, sources);
+            RunTests(runContext, testExecutionRecorder);
         }
 
-        private void RunTests(IRunContext runContext, ITestExecutionRecorder testExecutionRecorder, IEnumerable<string> source)
+        private void RunTests(IRunContext runContext, ITestExecutionRecorder testExecutionRecorder)
         {
             if (runContext.InIsolation)
                 launcher.TestProject.TestRunnerFactoryName = StandardTestRunnerFactoryNames.IsolatedAppDomain;
 
-            var extension = new VSTestWindowExtension(testExecutionRecorder, testCaseFactory, testResultFactory, source);
+            var extension = new VSTestWindowExtension(testExecutionRecorder, testCaseFactory, testResultFactory);
 
             launcher.TestProject.AddTestRunnerExtension(extension);
             launcher.Run();
@@ -55,17 +52,14 @@ namespace TestPlatform.Gallio
         {
             launcher = new TestLauncher();
 
-            var source = tests.GroupBy(tc => tc.Source).Select(testCaseGroup => testCaseGroup.Key).ToList();
-
             foreach (var test in tests)
             {
-                var filePath = test.GetPropertyValue(filePathProperty, "");
-                launcher.AddFilePattern(filePath);
+                launcher.AddFilePattern(test.Source);
             }
 
             SetTestFilter(tests);
 
-            RunTests(runContext, testExecutionRecorder, source);
+            RunTests(runContext, testExecutionRecorder);
         }
 
         private void SetTestFilter(IEnumerable<TestCase> tests)

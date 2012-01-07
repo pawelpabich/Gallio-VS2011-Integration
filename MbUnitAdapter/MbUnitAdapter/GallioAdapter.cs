@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Gallio.Loader;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -15,24 +14,24 @@ namespace TestPlatform.Gallio
         public const string ExecutorUri = "executor://www.mbunit.com/GallioAdapter";
 
         private readonly TestProperty testIdProperty;
-        private readonly TestProperty filePathProperty;
-        private readonly ITestCaseFactory testCaseFactory;
+        private readonly CachingTestCaseFactory cachingTestCaseFactory;
         private readonly ITestResultFactory testResultFactory;
         private readonly TestRunner testRunner;
         private readonly TestExplorer testExplorer;
+        private readonly TestCaseFactory testCaseFactory;
 
         public GallioAdapter()
         {
-             LoaderManager.InitializeAndSetupRuntimeIfNeeded();
+            LoaderManager.InitializeAndSetupRuntimeIfNeeded();
 
-             testIdProperty = TestProperty.Register("Gallio.TestId", "Test id", typeof(string), typeof(TestCase));
-             filePathProperty = TestProperty.Register("Gallio.FilePath", "File path", typeof(string), typeof(TestCase));
+            testIdProperty = TestProperty.Register("Gallio.TestId", "Test id", typeof(string), typeof(TestCase));
 
-            testCaseFactory = new CachingTestCaseFactory(new TestCaseFactory(testIdProperty, filePathProperty));
+            testCaseFactory = new TestCaseFactory(testIdProperty);
+            cachingTestCaseFactory = new CachingTestCaseFactory(testCaseFactory, testIdProperty);
             testResultFactory = new TestResultFactory();
 
-            testExplorer = new TestExplorer(testCaseFactory);
-            testRunner = new TestRunner(testCaseFactory, testResultFactory, testIdProperty, filePathProperty);
+            testExplorer = new TestExplorer(cachingTestCaseFactory);
+            testRunner = new TestRunner(cachingTestCaseFactory, testResultFactory, testIdProperty);
         }
 
         public void DiscoverTests(IEnumerable<string> sources, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
@@ -41,19 +40,19 @@ namespace TestPlatform.Gallio
         }
 
         public void Cancel()
-        {           
+        {
             testRunner.Cancel();
         }
 
         public void RunTests(IEnumerable<string> sources, IRunContext runContext, ITestExecutionRecorder testExecutionRecorder)
         {
-        
+            testCaseFactory.AddSources(sources);
             testRunner.RunTests(sources, runContext, testExecutionRecorder);
         }
 
         public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, ITestExecutionRecorder testExecutionRecorder)
         {
-        
+            cachingTestCaseFactory.AddTestCases(tests);
             testRunner.RunTests(tests, runContext, testExecutionRecorder);
         }
     }

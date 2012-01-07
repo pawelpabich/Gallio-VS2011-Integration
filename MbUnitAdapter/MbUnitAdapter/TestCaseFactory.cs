@@ -9,40 +9,50 @@ namespace TestPlatform.Gallio
     public class TestCaseFactory : ITestCaseFactory
     {
         private readonly TestProperty testIdProperty;
-        private readonly TestProperty filePathProperty;
 
-        public TestCaseFactory(TestProperty testIdProperty, TestProperty filePathProperty)
+        private IList<string> sources; 
+
+        public TestCaseFactory(TestProperty testIdProperty)
         {
             this.testIdProperty = testIdProperty;
-            this.filePathProperty = filePathProperty;
         }
 
-        public TestCase GetTestCase(TestData testData, IEnumerable<string> sources)
+        public TestCase GetTestCase(TestData testData)
         {
             var testCase = new TestCase(testData.FullName, new Uri(GallioAdapter.ExecutorUri))
             {
                 CodeFilePath = testData.CodeLocation.Path,
-                LineNumber = testData.CodeLocation.Line
+                LineNumber = testData.CodeLocation.Line,
+                DisplayName = testData.CodeReference.MemberName,
+                Source = GetSource(testData),
             };
 
-            if (testData.CodeElement == null)
-            {
-                foreach(var source in sources)
-                {
-                    testCase.Source = source;
-                }
-            }
-            else
-            {
-                testCase.DisplayName = testData.CodeElement.Name;
-                var assembly = ReflectionUtils.GetAssembly(testData.CodeElement);
-                testCase.Source = assembly.Path;
-                testCase.SetPropertyValue(filePathProperty, assembly.Path);
-            }
-       
             testCase.SetPropertyValue(testIdProperty, testData.Id);
 
             return testCase;
-        } 
+        }
+
+        private string GetSource(TestData testData)
+        {
+            if (testData.CodeElement != null)
+            {
+                var assembly = ReflectionUtils.GetAssembly(testData.CodeElement);
+                return assembly.Path;
+            }
+            if (sources.Count == 1)
+            {
+                return sources[0];
+            }
+            else
+            {
+                // TODO: match assembly name to source? really? :(
+                return null;
+            }
+        }
+
+        public void AddSources(IEnumerable<string> sources)
+        {
+            this.sources = new List<string>(sources);
+        }
     }
 }
