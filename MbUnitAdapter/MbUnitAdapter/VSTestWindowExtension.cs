@@ -1,6 +1,7 @@
 ﻿using Gallio.Runner.Events;
 using Gallio.Runner.Extensions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
 namespace TestPlatform.Gallio
 {

@@ -19,12 +19,11 @@ namespace TestPlatform.Gallio
 
         public TestCase GetTestCase(TestData testData)
         {
-            var testCase = new TestCase(testData.FullName, new Uri(GallioAdapter.ExecutorUri))
+            var testCase = new TestCase(testData.FullName, new Uri(GallioAdapter.ExecutorUri), GetSource(testData))
             {
                 CodeFilePath = testData.CodeLocation.Path,
                 LineNumber = testData.CodeLocation.Line,
-                DisplayName = testData.CodeReference.MemberName,
-                Source = GetSource(testData),
+                DisplayName = testData.CodeReference.MemberName
             };
 
             testCase.SetPropertyValue(testIdProperty, testData.Id);

@@ -16,7 +16,6 @@ namespace TestPlatform.Gallio
             var testResult = new TestResult(testCase)
             {
                 DisplayName = testData.Name,
-                ErrorLineNumber = testData.CodeLocation.Line,
                 StartTime = testStepRun.StartTime,
                 EndTime = testStepRun.EndTime,
                 Duration = testStepRun.Result.Duration,

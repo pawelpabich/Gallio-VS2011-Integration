@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Gallio.Loader;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 namespace TestPlatform.Gallio
@@ -22,6 +23,7 @@ namespace TestPlatform.Gallio
 
         public GallioAdapter()
         {
+
             LoaderManager.InitializeAndSetupRuntimeIfNeeded();
 
             testIdProperty = TestProperty.Register("Gallio.TestId", "Test id", typeof(string), typeof(TestCase));
@@ -34,9 +36,17 @@ namespace TestPlatform.Gallio
             testRunner = new TestRunner(cachingTestCaseFactory, testResultFactory, testIdProperty);
         }
 
-        public void DiscoverTests(IEnumerable<string> sources, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
+
+        public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
         {
-            testExplorer.DiscoverTests(sources, logger, discoverySink);
+            cachingTestCaseFactory.AddTestCases(tests);
+            testRunner.RunTests(tests, runContext, frameworkHandle);
+        }
+
+        public void RunTests(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle frameworkHandle)
+        {
+            testCaseFactory.AddSources(sources);
+            testRunner.RunTests(sources, runContext, frameworkHandle);
         }
 
         public void Cancel()
@@ -44,16 +54,9 @@ namespace TestPlatform.Gallio
             testRunner.Cancel();
         }
 
-        public void RunTests(IEnumerable<string> sources, IRunContext runContext, ITestExecutionRecorder testExecutionRecorder)
+        public void DiscoverTests(IEnumerable<string> sources, IDiscoveryContext discoveryContext, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
         {
-            testCaseFactory.AddSources(sources);
-            testRunner.RunTests(sources, runContext, testExecutionRecorder);
-        }
-
-        public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, ITestExecutionRecorder testExecutionRecorder)
-        {
-            cachingTestCaseFactory.AddTestCases(tests);
-            testRunner.RunTests(tests, runContext, testExecutionRecorder);
+            testExplorer.DiscoverTests(sources, logger, discoverySink);
         }
     }
 }

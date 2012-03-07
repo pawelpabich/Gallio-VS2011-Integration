@@ -3,6 +3,7 @@ using System.Linq;
 using Gallio.Model.Filters;
 using Gallio.Runner;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
 namespace TestPlatform.Gallio
 {
@@ -25,7 +26,7 @@ namespace TestPlatform.Gallio
             launcher.Cancel();
         }
 
-        public void RunTests(IEnumerable<string> sources, IRunContext runContext, ITestExecutionRecorder testExecutionRecorder)
+        public void RunTests(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle testExecutionRecorder)
         {
             launcher = new TestLauncher();
 
@@ -37,7 +38,7 @@ namespace TestPlatform.Gallio
             RunTests(runContext, testExecutionRecorder);
         }
 
-        private void RunTests(IRunContext runContext, ITestExecutionRecorder testExecutionRecorder)
+        private void RunTests(IRunContext runContext, IFrameworkHandle testExecutionRecorder)
         {
             if (runContext.InIsolation)
                 launcher.TestProject.TestRunnerFactoryName = StandardTestRunnerFactoryNames.IsolatedAppDomain;
@@ -48,7 +49,7 @@ namespace TestPlatform.Gallio
             launcher.Run();
         }
 
-        public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, ITestExecutionRecorder testExecutionRecorder)
+        public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle testExecutionRecorder)
         {
             launcher = new TestLauncher();
 
