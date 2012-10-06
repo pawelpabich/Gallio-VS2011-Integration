@@ -12,6 +12,7 @@ using Gallio.Runtime.Logging;
 using Gallio.Runtime.ProgressMonitoring;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Gallio.Common.Messaging.MessageSinks;
 
 namespace TestPlatform.Gallio
 {
