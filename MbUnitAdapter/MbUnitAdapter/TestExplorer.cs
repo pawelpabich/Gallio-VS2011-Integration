@@ -93,7 +93,7 @@ namespace TestPlatform.Gallio
 
         private static bool NotMsTestOrNunit(string testFrameworkHandleId)
         {
-            return testFrameworkHandleId != "MSTestAdapter.TestFramework" || testFrameworkHandleId != "NUnitAdapter.TestFramework";
+            return testFrameworkHandleId != "MSTestAdapter.TestFramework";
         }
 
         private static ICodeElementInfo LoadAssembly(string source, ReflectionOnlyAssemblyLoader loader)
