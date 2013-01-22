@@ -55,8 +55,10 @@ namespace TestPlatform.Gallio
         }
 
         public void DiscoverTests(IEnumerable<string> sources, IDiscoveryContext discoveryContext, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
-        {
-            testExplorer.DiscoverTests(sources, logger, discoverySink);
+        {           
+            //testExplorer.DiscoverTests(sources, logger, discoverySink);
+            testCaseFactory.AddSources(sources);
+            testExplorer.DiscoverTestsWithoutLockingDlls(sources, logger, discoverySink);
         }
     }
 }

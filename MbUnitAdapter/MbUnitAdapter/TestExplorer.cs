@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Gallio.Common.Messaging;
 using Gallio.Common.Reflection;
 using Gallio.Model;
 using Gallio.Model.Messages.Exploration;
 using Gallio.Model.Schema;
+using Gallio.Runner;
 using Gallio.Runtime;
 using Gallio.Runtime.Logging;
 using Gallio.Runtime.ProgressMonitoring;
@@ -18,6 +18,7 @@ namespace TestPlatform.Gallio
 {
     public class TestExplorer
     {
+        private const string MsTestFrameworkHandleId = "MSTestAdapter.TestFramework";
         private readonly ITestCaseFactory testCaseFactory;
 
         public TestExplorer(ITestCaseFactory testCaseFactory)
@@ -93,7 +94,7 @@ namespace TestPlatform.Gallio
 
         private static bool NotMsTestOrNunit(string testFrameworkHandleId)
         {
-            return testFrameworkHandleId != "MSTestAdapter.TestFramework";
+            return testFrameworkHandleId != MsTestFrameworkHandleId;
         }
 
         private static ICodeElementInfo LoadAssembly(string source, ReflectionOnlyAssemblyLoader loader)
@@ -124,6 +125,54 @@ namespace TestPlatform.Gallio
                     PublishTests(test.AllTests, discoverySink);
                 }
             }
+        }
+
+        public void DiscoverTestsWithoutLockingDlls(IEnumerable<string> sources, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
+        {
+            var frameworkLogger = new TestFrameworkLogger(logger);
+            try
+            {
+                var testRunnerManager = RuntimeAccessor.ServiceLocator.Resolve<ITestRunnerManager>();
+                // Do not use Local because then the dlls with test will be locked by the discovery process
+                var testRunnerFactory = testRunnerManager.GetFactory(StandardTestRunnerFactoryNames.IsolatedAppDomain);
+                var runner = testRunnerFactory.CreateTestRunner();
+                runner.Initialize(new TestRunnerOptions(), frameworkLogger, new ObservableProgressMonitor());
+                var testPackage = CreateTestPackage(sources);
+                var tests = FindTests(testPackage, runner);
+                SendTestCasesToVisualStudio(discoverySink, tests);
+            }
+            catch (Exception ex)
+            {
+                frameworkLogger.Log(LogSeverity.Error, "Gallio failed to load tests", ex);
+            }
+        }
+
+        private void SendTestCasesToVisualStudio(ITestCaseDiscoverySink discoverySink, List<TestData> tests)
+        {
+            foreach (var test in tests)
+            {
+                var vsTest = testCaseFactory.GetTestCase(test);
+                discoverySink.SendTestCase(vsTest);
+            }
+        }
+
+        private static List<TestData> FindTests(TestPackage testPackage, ITestRunner runner)
+        {
+            var options = new TestExplorationOptions();
+            testPackage.AddExcludedTestFrameworkId(MsTestFrameworkHandleId);
+            var result = runner.Explore(testPackage, options, new ObservableProgressMonitor());
+            var tests = result.TestModel.AllTests.Where(t => t.IsTestCase).ToList();
+            return tests;
+        }
+
+        private static TestPackage CreateTestPackage(IEnumerable<string> sources)
+        {
+            var testPackage = new TestPackage();
+            foreach (var source in sources)
+            {
+                testPackage.AddFile(new FileInfo(source));
+            }
+            return testPackage;
         }
     }
 }
