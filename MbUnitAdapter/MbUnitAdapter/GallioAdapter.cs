@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using Gallio.Loader;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
@@ -23,7 +25,7 @@ namespace TestPlatform.Gallio
 
         public GallioAdapter()
         {
-
+            Log("GallioAdapter adapter constructor");
             LoaderManager.InitializeAndSetupRuntimeIfNeeded();
 
             testIdProperty = TestProperty.Register("Gallio.TestId", "Test id", typeof(string), typeof(TestCase));
@@ -32,8 +34,14 @@ namespace TestPlatform.Gallio
             cachingTestCaseFactory = new CachingTestCaseFactory(testCaseFactory, testIdProperty);
             testResultFactory = new TestResultFactory();
 
-            testExplorer = new TestExplorer(cachingTestCaseFactory);
+            testExplorer = new TestExplorer(testCaseFactory);
             testRunner = new TestRunner(cachingTestCaseFactory, testResultFactory, testIdProperty);
+        }
+
+        private void Log(string message)
+        {
+            if (!Directory.Exists(@"C:\Addin")) Directory.CreateDirectory("C:\\Addin");
+            File.WriteAllText("C:\\Addin\\" + DateTime.Now.Ticks + ".txt", message);
         }
 
 
@@ -57,7 +65,6 @@ namespace TestPlatform.Gallio
         public void DiscoverTests(IEnumerable<string> sources, IDiscoveryContext discoveryContext, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
         {           
             //testExplorer.DiscoverTests(sources, logger, discoverySink);
-            testCaseFactory.AddSources(sources);
             testExplorer.DiscoverTestsWithoutLockingDlls(sources, logger, discoverySink);
         }
     }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
-using Gallio.Common.Reflection;
+using System.Reflection;
 using Gallio.Model.Schema;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -51,20 +51,9 @@ namespace TestPlatform.Gallio
 
         private string GetSource(TestData testData)
         {
-            if (testData.CodeElement != null)
-            {
-                var assembly = ReflectionUtils.GetAssembly(testData.CodeElement);
-                return assembly.Path;
-            }
-            if (sources.Count == 1)
-            {
-                return sources[0];
-            }
-            else
-            {
-                // TODO: match assembly name to source? really? :(
-                return null;
-            }
+            var assemblyName = new AssemblyName(testData.CodeReference.AssemblyName);
+            var pathToSourceAssembly = sources.Single(s => s.Contains(assemblyName.Name));
+            return pathToSourceAssembly;
         }
 
         public void AddSources(IEnumerable<string> sources)

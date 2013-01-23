@@ -19,9 +19,10 @@ namespace TestPlatform.Gallio
     public class TestExplorer
     {
         private const string MsTestFrameworkHandleId = "MSTestAdapter.TestFramework";
-        private readonly ITestCaseFactory testCaseFactory;
+        private const string NUnitTestFrameworkHandleId = "NUnitAdapter.TestFramework";
+        private readonly TestCaseFactory testCaseFactory;
 
-        public TestExplorer(ITestCaseFactory testCaseFactory)
+        public TestExplorer(TestCaseFactory testCaseFactory)
         {
             this.testCaseFactory = testCaseFactory;
         }
@@ -94,7 +95,7 @@ namespace TestPlatform.Gallio
 
         private static bool NotMsTestOrNunit(string testFrameworkHandleId)
         {
-            return testFrameworkHandleId != MsTestFrameworkHandleId;
+            return testFrameworkHandleId != MsTestFrameworkHandleId || testFrameworkHandleId != NUnitTestFrameworkHandleId;
         }
 
         private static ICodeElementInfo LoadAssembly(string source, ReflectionOnlyAssemblyLoader loader)
@@ -133,12 +134,13 @@ namespace TestPlatform.Gallio
             try
             {
                 var testRunnerManager = RuntimeAccessor.ServiceLocator.Resolve<ITestRunnerManager>();
-                // Do not use Local because then the dlls with test will be locked by the discovery process
+                // Do not use Local because then the dlls with tests will be locked by the discovery process
                 var testRunnerFactory = testRunnerManager.GetFactory(StandardTestRunnerFactoryNames.IsolatedAppDomain);
                 var runner = testRunnerFactory.CreateTestRunner();
                 runner.Initialize(new TestRunnerOptions(), frameworkLogger, new ObservableProgressMonitor());
                 var testPackage = CreateTestPackage(sources);
                 var tests = FindTests(testPackage, runner);
+                testCaseFactory.AddSources(sources);
                 SendTestCasesToVisualStudio(discoverySink, tests);
             }
             catch (Exception ex)
@@ -160,6 +162,7 @@ namespace TestPlatform.Gallio
         {
             var options = new TestExplorationOptions();
             testPackage.AddExcludedTestFrameworkId(MsTestFrameworkHandleId);
+            testPackage.AddExcludedTestFrameworkId(NUnitTestFrameworkHandleId);
             var result = runner.Explore(testPackage, options, new ObservableProgressMonitor());
             var tests = result.TestModel.AllTests.Where(t => t.IsTestCase).ToList();
             return tests;

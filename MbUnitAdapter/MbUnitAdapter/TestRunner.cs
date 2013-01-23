@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using Gallio.Loader;
 using Gallio.Model.Filters;
 using Gallio.Runner;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -40,13 +43,31 @@ namespace TestPlatform.Gallio
 
         private void RunTests(IRunContext runContext, IFrameworkHandle testExecutionRecorder)
         {
-            if (runContext.InIsolation)
+            try
+            {
+                Log(Environment.CurrentDirectory +  " " + runContext.SolutionDirectory + " " + runContext.TestRunDirectory);
+                Log(Environment.Is64BitProcess + " " + LoaderManager.Loader.RuntimePath);
+                // testExecutionRecorder.RecordEnd();
+                //if (runContext.InIsolation)
                 launcher.TestProject.TestRunnerFactoryName = StandardTestRunnerFactoryNames.IsolatedAppDomain;
 
-            var extension = new VSTestWindowExtension(testExecutionRecorder, testCaseFactory, testResultFactory);
+                var extension = new VSTestWindowExtension(testExecutionRecorder, testCaseFactory, testResultFactory);
 
-            launcher.TestProject.AddTestRunnerExtension(extension);
-            launcher.Run();
+                launcher.TestProject.AddTestRunnerExtension(extension);
+                launcher.Run();
+
+            }
+            catch (Exception e)
+            {
+               Log(e.ToString());
+               throw;
+            }
+        }
+
+        private void Log(string message)
+        {
+            if (!Directory.Exists(@"C:\Addin")) Directory.CreateDirectory("C:\\Addin");
+            File.WriteAllText("C:\\Addin\\" + DateTime.Now.Ticks + ".txt", message);
         }
 
         public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle testExecutionRecorder)

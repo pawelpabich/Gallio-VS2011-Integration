@@ -2,7 +2,7 @@ Gallio VS2012 Integration
 
 This project is a prototype that integrates the VS2012 Test Window and Gallio.
 
-You will need to download and install Gallio (http://www.gallio).
+You will need to download and install Gallio (http://www.gallio). http://mb-unit.googlecode.com/files/GallioBundle-3.4.14.0-Setup-x64.msi is the latest build tested with the adapter.
 
 If you want to compile the adapter yourself you will need VS2012 SDK (http://www.microsoft.com/en-au/download/details.aspx?id=30668)
 
